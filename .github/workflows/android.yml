@@ -27,7 +27,7 @@ jobs:
         with:
           accept-android-sdk-licenses: 'true'
 
-      - name: Accept SDK licenses
+      - name: Accept licenses
         run: yes | sdkmanager --licenses
 
       - name: Install SDK
@@ -40,6 +40,20 @@ jobs:
 
       - name: Extract project
         run: unzip -q CalculatorAndroidProject.zip -d extracted
+
+      - name: Fix Kotlin dependencies
+        working-directory: extracted/CalculatorAndroidProject
+        run: |
+          cat >> app/build.gradle <<'EOF'
+
+          configurations.configureEach {
+              resolutionStrategy.force(
+                  'org.jetbrains.kotlin:kotlin-stdlib:1.8.22',
+                  'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22',
+                  'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+              )
+          }
+          EOF
 
       - name: Build APK
         working-directory: extracted/CalculatorAndroidProject
